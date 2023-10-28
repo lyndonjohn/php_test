@@ -4,17 +4,23 @@ declare(strict_types=1);
 
 namespace App\Utils;
 
+use App\Class\Comment;
+use Carbon\Carbon;
+
 class CommentManager
 {
     private static $instance = null;
+    private $db;
 
     private function __construct()
     {
-        require_once(ROOT . '/utils/DB.php');
-        require_once(ROOT . '/class/Comment.php');
+        $this->db = DB::getInstance();
     }
 
-    public static function getInstance()
+    /**
+     * @return mixed
+     */
+    public static function getInstance(): mixed
     {
         if (null === self::$instance) {
             $c = __CLASS__;
@@ -23,35 +29,61 @@ class CommentManager
         return self::$instance;
     }
 
-    public function listComments()
+    /**
+     * @return array
+     */
+    public function index(): array
     {
-        $db = DB::getInstance();
-        $rows = $db->select('SELECT * FROM `comment`');
+        $rows = $this->db->select('SELECT * FROM comment');
 
         $comments = [];
         foreach ($rows as $row) {
             $n = new Comment();
             $comments[] = $n->setId($row['id'])
-              ->setBody($row['body'])
-              ->setCreatedAt($row['created_at'])
-              ->setNewsId($row['news_id']);
+                ->setBody($row['body'])
+                ->setCreatedAt($row['created_at'])
+                ->setNewsId($row['news_id']);
         }
 
         return $comments;
     }
 
-    public function addCommentForNews($body, $newsId)
+    /**
+     * @param string $body
+     * @param int $newsId
+     * @return mixed
+     */
+    public function store(string $body, int $newsId): mixed
     {
-        $db = DB::getInstance();
-        $sql = "INSERT INTO `comment` (`body`, `created_at`, `news_id`) VALUES('" . $body . "','" . date('Y-m-d') . "','" . $newsId . "')";
-        $db->exec($sql);
-        return $db->lastInsertId($sql);
+        $query = 'INSERT INTO
+            comment
+        SET
+            news_id = ?,
+            body = ?,
+            created_at = ?
+        ';
+
+        $sql = $this->db->prepare($query);
+        $sql->execute(
+            [
+                $newsId,
+                $body,
+                Carbon::now()
+            ]
+        );
+
+        return $this->db->lastInsertId($sql);
     }
 
-    public function deleteComment($id)
+    /**
+     * @param int $id
+     * @return bool
+     */
+    public function delete(int $id): bool
     {
-        $db = DB::getInstance();
-        $sql = "DELETE FROM `comment` WHERE `id`=" . $id;
-        return $db->exec($sql);
+        $sql = $this->db->prepare("DELETE FROM comment WHERE news_id = ?");
+        $sql->execute([$id]);
+
+        return true;
     }
 }

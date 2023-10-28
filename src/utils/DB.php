@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Utils;
 
+use PDOStatement;
+
 class DB
 {
     private $pdo;
@@ -42,5 +44,14 @@ class DB
     public function lastInsertId()
     {
         return $this->pdo->lastInsertId();
+    }
+
+    /**
+     * @param string $sql
+     * @return bool|PDOStatement
+     */
+    public function prepare(string $sql): bool|\PDOStatement
+    {
+        return $this->pdo->prepare($sql);
     }
 }
