@@ -61,4 +61,28 @@ class DB
     {
         return $this->pdo->prepare($sql);
     }
+
+    /**
+     * @return bool
+     */
+    public function beginTransaction(): bool
+    {
+        return $this->pdo->beginTransaction();
+    }
+
+    /**
+     * @return bool
+     */
+    public function commit(): bool
+    {
+        return $this->pdo->commit();
+    }
+
+    /**
+     * @return bool
+     */
+    public function rollBack(): bool
+    {
+        return $this->pdo->rollBack();
+    }
 }

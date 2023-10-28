@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Utils;
 
+use App\Class\Comment;
 use App\Class\News;
 use Carbon\Carbon;
 
@@ -88,10 +89,12 @@ class NewsManager
             $sql->execute([$id]);
 
             /**
-             * news_id foreign key in comment table can be setup as cascade on delete
-             * to automatically delete child if parent is deleted
+             * the code below can be prevented if news_id foreign key in comment table
+             * was setup as cascade on delete to automatically delete child if parent is deleted.
              */
-            CommentManager::getInstance()->delete($id);
+            foreach ($this->comments($id) as $comment) {
+                CommentManager::getInstance()->delete($comment->getId());
+            }
 
             $this->db->commit();
 
@@ -108,5 +111,24 @@ class NewsManager
 
             return false;
         }
+    }
+
+    /**
+     * @param int $id
+     * @return array
+     */
+    public function comments(int $id): array
+    {
+        $rows = $this->db->prepare('SELECT id, body FROM comment WHERE news_id = ?');
+        $rows->execute([$id]);
+
+        $comments = [];
+        foreach ($rows->fetchAll() as $row) {
+            $n = new Comment();
+            $comments[] = $n->setId($row['id'])
+                ->setBody($row['body']);
+        }
+
+        return $comments;
     }
 }

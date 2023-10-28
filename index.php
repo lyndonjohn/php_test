@@ -1,18 +1,34 @@
 <?php
 
-define('ROOT', __DIR__);
-require_once(ROOT . '/utils/NewsManager.php');
-require_once(ROOT . '/utils/CommentManager.php');
+declare(strict_types=1);
 
-foreach (NewsManager::getInstance()->listNews() as $news) {
-	echo("############ NEWS " . $news->getTitle() . " ############\n");
-	echo($news->getBody() . "\n");
-	foreach (CommentManager::getInstance()->listComments() as $comment) {
-		if ($comment->getNewsId() == $news->getId()) {
-			echo("Comment " . $comment->getId() . " : " . $comment->getBody() . "\n");
-		}
-	}
+use App\Utils\CommentManager;
+use App\Utils\NewsManager;
+
+require_once __DIR__ . '/vendor/autoload.php';
+
+$news = NewsManager::getInstance();
+$comment = CommentManager::getInstance();
+
+// add news
+//$news->store('Israel Updates', 'Israel attacking gaza');
+
+// delete news
+//$news->delete(15);
+
+// add comment
+//$comment->store('the quick brown fox', 10);
+
+// delete comment
+//$comment->delete(16);
+
+foreach ($news->index() as $row) {
+    echo "############ NEWS: " . $row->getTitle() . " ############\n";
+    echo "News body: " . $row->getBody() . "\n";
+
+    foreach ($news->comments($row->getId()) as $comment) {
+        echo "\tComment " . $comment->getId() . ": " . $comment->getBody() . "\n";
+    }
+
+    echo "\n";
 }
-
-$commentManager = CommentManager::getInstance();
-$c = $commentManager->listComments();

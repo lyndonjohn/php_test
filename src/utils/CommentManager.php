@@ -51,9 +51,9 @@ class CommentManager
     /**
      * @param string $body
      * @param int $newsId
-     * @return bool
+     * @return mixed
      */
-    public function store(string $body, int $newsId): bool
+    public function store(string $body, int $newsId): mixed
     {
         try {
             $query = 'INSERT INTO
@@ -93,7 +93,7 @@ class CommentManager
     public function delete(int $id): bool
     {
         try {
-            $sql = $this->db->prepare('DELETE FROM comment WHERE news_id = ?');
+            $sql = $this->db->prepare('DELETE FROM comment WHERE id = ?');
             $sql->execute([$id]);
 
             return true;
