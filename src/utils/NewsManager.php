@@ -4,15 +4,17 @@ declare(strict_types=1);
 
 namespace App\Utils;
 
+use App\Class\News;
+use Carbon\Carbon;
+
 class NewsManager
 {
     private static $instance = null;
+    private $db;
 
     private function __construct()
     {
-        require_once(ROOT . '/utils/DB.php');
-        require_once(ROOT . '/utils/CommentManager.php');
-        require_once(ROOT . '/class/News.php');
+        $this->db = DB::getInstance();
     }
 
     public static function getInstance()
@@ -25,56 +27,86 @@ class NewsManager
     }
 
     /**
-    * list all news
-    */
-    public function listNews()
+     * @return array
+     */
+    public function index(): array
     {
-        $db = DB::getInstance();
-        $rows = $db->select('SELECT * FROM `news`');
+        $rows = $this->db->select('SELECT * FROM news');
 
         $news = [];
         foreach ($rows as $row) {
             $n = new News();
             $news[] = $n->setId($row['id'])
-              ->setTitle($row['title'])
-              ->setBody($row['body'])
-              ->setCreatedAt($row['created_at']);
+                ->setTitle($row['title'])
+                ->setBody($row['body'])
+                ->setCreatedAt($row['created_at']);
         }
 
         return $news;
     }
 
     /**
-    * add a record in news table
-    */
-    public function addNews($title, $body)
+     * @param string $title
+     * @param string $body
+     * @return mixed
+     */
+    public function store(string $title, string $body): mixed
     {
-        $db = DB::getInstance();
-        $sql = "INSERT INTO `news` (`title`, `body`, `created_at`) VALUES('" . $title . "','" . $body . "','" . date('Y-m-d') . "')";
-        $db->exec($sql);
-        return $db->lastInsertId($sql);
+        $query = 'INSERT INTO
+            news
+        SET
+            title = ?,
+            body = ?,
+            created_at = ?
+        ';
+
+        $sql = $this->db->prepare($query);
+        $sql->execute(
+            [
+                $title,
+                $body,
+                Carbon::now()
+            ]
+        );
+
+        return $this->db->lastInsertId($sql);
     }
 
     /**
-    * deletes a news, and also linked comments
-    */
-    public function deleteNews($id)
+     * @param int $id
+     * @return bool
+     */
+    public function delete(int $id): bool
     {
-        $comments = CommentManager::getInstance()->listComments();
-        $idsToDelete = [];
+        try {
+            /**
+             * added transaction since we are touching two tables
+             */
+            $this->db->beginTransaction();
 
-        foreach ($comments as $comment) {
-            if ($comment->getNewsId() == $id) {
-                $idsToDelete[] = $comment->getId();
-            }
+            $sql = $this->db->prepare('DELETE FROM news WHERE id = ?');
+            $sql->execute([$id]);
+
+            /**
+             * news_id foreign key in comment table can be setup as cascade on delete
+             * to automatically delete child if parent is deleted
+             */
+            CommentManager::getInstance()->delete($id);
+
+            $this->db->commit();
+
+            return true;
+        } catch (\Exception $e) {
+            $this->db->rollback();
+
+            $message = "[" . Carbon::now() . "] Failed to delete news.";
+            error_log(
+                $message . $e->getMessage() . "\r\n",
+                3,
+                __DIR__ . "/../../error.log"
+            );
+
+            return false;
         }
-
-        foreach ($idsToDelete as $id) {
-            CommentManager::getInstance()->deleteComment($id);
-        }
-
-        $db = DB::getInstance();
-        $sql = "DELETE FROM `news` WHERE `id`=" . $id;
-        return $db->exec($sql);
     }
 }

@@ -51,28 +51,39 @@ class CommentManager
     /**
      * @param string $body
      * @param int $newsId
-     * @return mixed
+     * @return bool
      */
-    public function store(string $body, int $newsId): mixed
+    public function store(string $body, int $newsId): bool
     {
-        $query = 'INSERT INTO
-            comment
-        SET
-            news_id = ?,
-            body = ?,
-            created_at = ?
-        ';
+        try {
+            $query = 'INSERT INTO
+                comment
+            SET
+                news_id = ?,
+                body = ?,
+                created_at = ?
+            ';
 
-        $sql = $this->db->prepare($query);
-        $sql->execute(
-            [
-                $newsId,
-                $body,
-                Carbon::now()
-            ]
-        );
+            $sql = $this->db->prepare($query);
+            $sql->execute(
+                [
+                    $newsId,
+                    $body,
+                    Carbon::now()
+                ]
+            );
 
-        return $this->db->lastInsertId($sql);
+            return $this->db->lastInsertId($sql);
+        } catch (\Exception $e) {
+            $message = "[" . Carbon::now() . "] Failed to store comment. ";
+            error_log(
+                $message . $e->getMessage() . "\r\n",
+                3,
+                __DIR__ . "/../../error.log"
+            );
+
+            return false;
+        }
     }
 
     /**
@@ -81,9 +92,20 @@ class CommentManager
      */
     public function delete(int $id): bool
     {
-        $sql = $this->db->prepare("DELETE FROM comment WHERE news_id = ?");
-        $sql->execute([$id]);
+        try {
+            $sql = $this->db->prepare('DELETE FROM comment WHERE news_id = ?');
+            $sql->execute([$id]);
 
-        return true;
+            return true;
+        } catch (\Exception $e) {
+            $message = "[" . Carbon::now() . "] Failed to delete comment. ";
+            error_log(
+                $message . $e->getMessage() . "\r\n",
+                3,
+                __DIR__ . "/../../error.log"
+            );
+
+            return false;
+        }
     }
 }
