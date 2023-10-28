@@ -1,3 +1,16 @@
 Changelog [2023-10-28]
+
 1. Initialize git
-2. Initialize composer for autoloading of classes
+2. Initialize composer
+3. Installed squizlabs/php_codesniffer for check codes for PSR12 standard
+4. Installed nesbot/carbon for date handling
+5. Added namespace and declare(strict_types=1) for strict typing and robust code
+6. Declared each property on a separate line in comment class as per PSR12 standard
+7. Added type declaration on each properties
+8. Added PHPDoc comment and return types on methods
+9. Type hinted parameters to make sure that you are passing the correct data type
+10. Converted queries into prepared statement with positional placeholder to avoid sql injection
+11. Added try catch block and error logging on store and delete methods
+12. Added beginTransaction, commit, and rollback methods on DB class
+13. Removed unused methods in DB class
+14. Cleaned up index.php and autoload all classes
