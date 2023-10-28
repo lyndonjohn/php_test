@@ -6,52 +6,83 @@ namespace App\Class;
 
 class News
 {
-    protected $id, $title, $body, $createdAt;
+    protected int $id;
+    protected string $title;
+    protected string $body;
+    protected string $createdAt;
 
-    public function setId($id)
+    /**
+     * @param $id
+     * @return $this
+     */
+    public function setId(int $id): static
     {
         $this->id = $id;
 
         return $this;
     }
 
-    public function getId()
+    /**
+     * @return int
+     */
+    public function getId(): int
     {
         return $this->id;
     }
 
-    public function setTitle($title)
+    /**
+     * @param $title
+     * @return $this
+     */
+    public function setTitle($title): static
     {
         $this->title = $title;
 
         return $this;
     }
 
-    public function getTitle()
+    /**
+     * @return string
+     */
+    public function getTitle(): string
     {
         return $this->title;
     }
 
-    public function setBody($body)
+    /**
+     * @param string $body
+     * @return $this
+     */
+    public function setBody(string $body): static
     {
         $this->body = $body;
 
         return $this;
     }
 
-    public function getBody()
+    /**
+     * @return string
+     */
+    public function getBody(): string
     {
         return $this->body;
     }
 
-    public function setCreatedAt($createdAt)
+    /**
+     * @param string $createdAt
+     * @return $this
+     */
+    public function setCreatedAt(string $createdAt): static
     {
         $this->createdAt = $createdAt;
 
         return $this;
     }
 
-    public function getCreatedAt()
+    /**
+     * @return string
+     */
+    public function getCreatedAt(): string
     {
         return $this->createdAt;
     }
