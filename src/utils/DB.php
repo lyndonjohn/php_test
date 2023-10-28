@@ -4,24 +4,29 @@ declare(strict_types=1);
 
 namespace App\Utils;
 
+use PDO;
 use PDOStatement;
 
 class DB
 {
-    private $pdo;
+    private PDO $pdo;
+    private string $host = "127.0.0.1";
+    private string $db_name = "phptest";
+    private string $user = "root";
+    private string $password = "";
 
     private static $instance = null;
 
     private function __construct()
     {
-        $dsn = 'mysql:dbname=phptest;host=127.0.0.1';
-        $user = 'root';
-        $password = '';
-
-        $this->pdo = new \PDO($dsn, $user, $password);
+        $dsn = 'mysql:dbname=' . $this->db_name . ';host=' . $this->host;
+        $this->pdo = new PDO($dsn, $this->user, $this->password);
     }
 
-    public static function getInstance()
+    /**
+     * @return mixed
+     */
+    public static function getInstance(): mixed
     {
         if (null === self::$instance) {
             $c = __CLASS__;
@@ -30,18 +35,20 @@ class DB
         return self::$instance;
     }
 
-    public function select($sql)
+    /**
+     * @param string $sql
+     * @return array
+     */
+    public function select(string $sql): array
     {
         $sth = $this->pdo->query($sql);
         return $sth->fetchAll();
     }
 
-    public function exec($sql)
-    {
-        return $this->pdo->exec($sql);
-    }
-
-    public function lastInsertId()
+    /**
+     * @return string
+     */
+    public function lastInsertId(): string
     {
         return $this->pdo->lastInsertId();
     }
