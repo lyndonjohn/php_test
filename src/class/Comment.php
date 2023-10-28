@@ -6,49 +6,81 @@ namespace App\Class;
 
 class Comment
 {
-    protected $id, $body, $createdAt, $newsId;
+    protected int $id;
+    protected string $body;
+    protected string $createdAt;
+    protected int $newsId;
 
-    public function setId($id)
+    /**
+     * @param int $id
+     * @return $this
+     */
+    public function setId(int $id): static
     {
         $this->id = $id;
 
         return $this;
     }
 
-    public function getId()
+    /**
+     * @return int
+     */
+    public function getId(): int
     {
         return $this->id;
     }
-    public function setBody($body)
+
+    /**
+     * @param string $body
+     * @return $this
+     */
+    public function setBody(string $body): static
     {
         $this->body = $body;
 
         return $this;
     }
 
-    public function getBody()
+    /**
+     * @return string
+     */
+    public function getBody(): string
     {
         return $this->body;
     }
 
-    public function setCreatedAt($createdAt)
+    /**
+     * @param string $createdAt
+     * @return $this
+     */
+    public function setCreatedAt(string $createdAt): static
     {
         $this->createdAt = $createdAt;
 
         return $this;
     }
 
-    public function getCreatedAt()
+    /**
+     * @return string
+     */
+    public function getCreatedAt(): string
     {
         return $this->createdAt;
     }
 
-    public function getNewsId()
+    /**
+     * @return int
+     */
+    public function getNewsId(): int
     {
         return $this->newsId;
     }
 
-    public function setNewsId($newsId)
+    /**
+     * @param int $newsId
+     * @return $this
+     */
+    public function setNewsId(int $newsId): static
     {
         $this->newsId = $newsId;
 
