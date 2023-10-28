@@ -1,0 +1,20 @@
+{
+    "name": "lyndonjohn/php-test",
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "lyndonjohn",
+            "email": "lyndonjohn@hotmail.ph"
+        }
+    ],
+    "require-dev": {
+        "squizlabs/php_codesniffer": "^3.7"
+    },
+    "require": {
+        "nesbot/carbon": "^2.71"
+    }
+}
