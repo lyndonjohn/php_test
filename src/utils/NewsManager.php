@@ -124,8 +124,8 @@ class NewsManager
 
         $comments = [];
         foreach ($rows->fetchAll() as $row) {
-            $n = new Comment();
-            $comments[] = $n->setId($row['id'])
+            $c = new Comment();
+            $comments[] = $c->setId($row['id'])
                 ->setBody($row['body']);
         }
 
